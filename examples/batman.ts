@@ -1,11 +1,11 @@
-import { COMICS } from '..';
+import { COMICS } from "..";
 
 const main = async () => {
   const getComics = new COMICS.GetComics();
 
-  const { containers } = await getComics.search('Batman');
+  const { containers } = await getComics.search("Batman");
 
-  for (let v of containers) {
+  for (const v of containers) {
     console.log(v.title);
   }
 };

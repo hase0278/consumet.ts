@@ -19,35 +19,126 @@ export interface IAnimeResult {
     title: string | ITitle;
     url?: string;
     image?: string;
+    imageHash?: string;
+    cover?: string;
+    coverHash?: string;
+    status?: MediaStatus;
+    rating?: number;
+    type?: MediaFormat;
     releaseDate?: string;
-    [x: string]: unknown;
+    relationType?: string;
+    [x: string]: any;
 }
 export interface ISearch<T> {
     currentPage?: number;
     hasNextPage?: boolean;
+    totalPages?: number;
+    /**
+     * total results must include results from all pages
+     */
+    totalResults?: number;
     results: T[];
 }
+export interface Trailer {
+    id: string;
+    url?: string;
+    site?: string;
+    thumbnail?: string;
+    thumbnailHash?: string | null;
+}
+export interface FuzzyDate {
+    year?: number;
+    month?: number;
+    day?: number;
+}
+export interface ExternalLink {
+    id?: string;
+    url?: string;
+    sourceName?: string;
+}
+export declare enum MediaFormat {
+    TV = "TV",
+    TV_SHORT = "TV_SHORT",
+    TV_SPECIAL = "TV_SPECIAL",
+    MOVIE = "MOVIE",
+    SPECIAL = "SPECIAL",
+    OVA = "OVA",
+    ONA = "ONA",
+    MUSIC = "MUSIC",
+    MANGA = "MANGA",
+    NOVEL = "NOVEL",
+    ONE_SHOT = "ONE_SHOT",
+    PV = "PV",
+    COMIC = "COMIC"
+}
 export interface IAnimeInfo extends IAnimeResult {
+    malId?: number | string;
     genres?: string[];
     description?: string;
-    type?: string;
     status?: MediaStatus;
     totalEpisodes?: number;
+    /**
+     * @deprecated use `hasSub` or `hasDub` instead
+     */
     subOrDub?: SubOrSub;
+    hasSub?: boolean;
+    hasDub?: boolean;
+    synonyms?: string[];
+    /**
+     * two letter representation of coutnry: e.g JP for japan
+     */
+    countryOfOrigin?: string;
+    isAdult?: boolean;
+    isLicensed?: boolean;
+    /**
+     * `FALL`, `WINTER`, `SPRING`, `SUMMER`
+     */
+    season?: string;
+    studios?: string[];
+    color?: string;
+    cover?: string;
+    externalLinks?: ExternalLink[];
+    trailer?: Trailer;
     episodes?: IAnimeEpisode[];
+    startDate?: FuzzyDate;
+    endDate?: FuzzyDate;
+    recommendations?: IAnimeResult[];
+    relations?: IAnimeResult[];
+}
+export interface IAnimeEpisodeV2 {
+    [x: string]: {
+        id: string;
+        season_number: number;
+        title: string;
+        image: string;
+        imageHash: string;
+        description: string;
+        releaseDate: string;
+        isHD: boolean;
+        isAdult: boolean;
+        isDubbed: boolean;
+        isSubbed: boolean;
+        duration: number;
+    }[];
 }
 export interface IAnimeEpisode {
     id: string;
     number: number;
     title?: string;
+    description?: string;
+    isFiller?: boolean;
+    isSubbed?: boolean;
+    isDubbed?: boolean;
     url?: string;
     image?: string;
+    imageHash?: string;
     releaseDate?: string;
     [x: string]: unknown;
 }
 export interface IEpisodeServer {
     name: string;
     url: string;
+    [x: string]: unknown;
 }
 export interface IVideo {
     /**
@@ -63,17 +154,41 @@ export interface IVideo {
      */
     isM3U8?: boolean;
     /**
+     * set this to `true` if the video is dash (mpd)
+     */
+    isDASH?: boolean;
+    /**
      * size of the video in **bytes**
      */
     size?: number;
     [x: string]: unknown;
 }
 export declare enum StreamingServers {
+    VideoStr = "videostr",
+    AsianLoad = "asianload",
     GogoCDN = "gogocdn",
     StreamSB = "streamsb",
     MixDrop = "mixdrop",
+    Mp4Upload = "mp4upload",
     UpCloud = "upcloud",
-    VidCloud = "vidcloud"
+    VidCloud = "vidcloud",
+    StreamTape = "streamtape",
+    VizCloud = "vizcloud",
+    MyCloud = "mycloud",
+    Filemoon = "filemoon",
+    VidStreaming = "vidstreaming",
+    DuckStream = "duckstream",
+    BirdStream = "birdstream",
+    BuiltIn = "builtin",
+    SmashyStream = "smashystream",
+    StreamHub = "streamhub",
+    StreamWish = "streamwish",
+    VidHide = "vidhide",
+    VidMoly = "vidmoly",
+    Voe = "voe",
+    MegaUp = "megaup",
+    MegaCloud = "megacloud",
+    Luffy = "luffy"
 }
 export declare enum MediaStatus {
     ONGOING = "Ongoing",
@@ -83,14 +198,23 @@ export declare enum MediaStatus {
     NOT_YET_AIRED = "Not yet aired",
     UNKNOWN = "Unknown"
 }
+export declare enum WatchListType {
+    WATCHING = "watching",
+    ONHOLD = "on-hold",
+    PLAN_TO_WATCH = "plan to watch",
+    DROPPED = "dropped",
+    COMPLETED = "completed",
+    NONE = "none"
+}
 export declare enum SubOrSub {
     SUB = "sub",
-    DUB = "dub"
+    DUB = "dub",
+    BOTH = "both"
 }
 export interface IMangaResult {
     id: string;
     title: string | [lang: string][] | ITitle;
-    altTitles?: string | [lang: string][];
+    altTitles?: string | string[] | [lang: string][];
     image?: string;
     description?: string | [lang: string][] | {
         [lang: string]: string;
@@ -104,11 +228,16 @@ export interface IMangaChapter {
     title: string;
     volume?: number;
     pages?: number;
+    releaseDate?: string;
+    [x: string]: unknown;
 }
 export interface IMangaInfo extends IMangaResult {
+    malId?: number | string;
     authors?: string[];
     genres?: string[];
     links?: string[];
+    characters?: any[];
+    recommendations?: IMangaResult[];
     chapters?: IMangaChapter[];
 }
 export interface IMangaChapterPage {
@@ -130,8 +259,9 @@ export interface ILightNovelChapter {
     url?: string;
 }
 export interface ILightNovelChapterContent {
+    novelTitle: string;
+    chapterTitle: string;
     text: string;
-    html?: string;
 }
 export interface ILightNovelInfo extends ILightNovelResult {
     authors?: string[];
@@ -173,16 +303,13 @@ export interface GetComicsComics {
 }
 export interface ComicRes {
     containers: GetComicsComics[];
-    pages: number;
-}
-export interface ZLibrary extends Book {
-    bookRating: string;
-    bookQuality: string;
-    language: string;
-    size: string;
-    pages: string;
+    hasNextPage: boolean;
 }
 export interface ISubtitle {
+    /**
+     * The id of the subtitle. **not** required
+     */
+    id?: string;
     /**
      * The **url** that should take you to the subtitle **directly**.
      */
@@ -192,12 +319,26 @@ export interface ISubtitle {
      */
     lang: string;
 }
+/**
+ * The start, and the end of the intro or opening in seconds.
+ */
+export interface Intro {
+    start: number;
+    end: number;
+}
 export interface ISource {
     headers?: {
         [k: string]: string;
     };
+    intro?: Intro;
+    outro?: Intro;
     subtitles?: ISubtitle[];
     sources: IVideo[];
+    download?: string | {
+        url?: string;
+        quality?: string;
+    }[];
+    embedURL?: string;
 }
 /**
  * Used **only** for movie/tvshow providers
@@ -205,14 +346,16 @@ export interface ISource {
 export declare enum TvType {
     TVSERIES = "TV Series",
     MOVIE = "Movie",
-    ANIME = "Anime"
+    ANIME = "Anime",
+    PEOPLE = "People"
 }
 export interface IMovieEpisode {
     id: string;
     title: string;
-    url: string;
+    url?: string;
     number?: number;
     season?: number;
+    description?: string;
     image?: string;
     releaseDate?: string;
     [x: string]: unknown;
@@ -220,13 +363,55 @@ export interface IMovieEpisode {
 export interface IMovieResult {
     id: string;
     title: string | ITitle;
-    url: string;
+    url?: string;
     image?: string;
     releaseDate?: string;
     type?: TvType;
     [x: string]: unknown;
 }
+export interface IPeopleResult {
+    id: string;
+    name: string;
+    rating?: string;
+    image?: string;
+    movies: IMovieResult[];
+    [x: string]: unknown;
+}
+export interface INewsFeed extends INews {
+    /** topics of the feed */
+    topics: Topics[];
+    /** preview of the news feed */
+    preview: INewsFeedPreview;
+}
+export interface INewsInfo extends INews {
+    /** intro of the news */
+    intro: string;
+    /** description of the news */
+    description: string;
+}
+interface INews {
+    /** id of the news */
+    id: string;
+    /** title of the news */
+    title: string;
+    /** time at which the news was uploaded */
+    uploadedAt: string;
+    /** thumbnail image URL of the news */
+    thumbnail: string;
+    /** thumbnail image blurhash code of the news */
+    thumbnailHash: string;
+    /** URL of the news */
+    url: string;
+}
+interface INewsFeedPreview {
+    /** intro of the feed */
+    intro: string;
+    /** some contents of the feed */
+    full: string;
+}
 export interface IMovieInfo extends IMovieResult {
+    cover?: string;
+    recommendations?: IMovieResult[];
     genres?: string[];
     description?: string;
     rating?: number;
@@ -236,5 +421,88 @@ export interface IMovieInfo extends IMovieResult {
     casts?: string[];
     tags?: string[];
     totalEpisodes?: number;
+    trailer?: Trailer;
+    seasons?: {
+        season: number;
+        image?: string;
+        episodes: IMovieEpisode[];
+    }[];
     episodes?: IMovieEpisode[];
 }
+export declare enum Genres {
+    ACTION = "Action",
+    ADVENTURE = "Adventure",
+    CARS = "Cars",
+    COMEDY = "Comedy",
+    DRAMA = "Drama",
+    FANTASY = "Fantasy",
+    HORROR = "Horror",
+    MAHOU_SHOUJO = "Mahou Shoujo",
+    MECHA = "Mecha",
+    MUSIC = "Music",
+    MYSTERY = "Mystery",
+    PSYCHOLOGICAL = "Psychological",
+    ROMANCE = "Romance",
+    SCI_FI = "Sci-Fi",
+    SLICE_OF_LIFE = "Slice of Life",
+    SPORTS = "Sports",
+    SUPERNATURAL = "Supernatural",
+    THRILLER = "Thriller"
+}
+export declare enum Topics {
+    ANIME = "anime",
+    ANIMATION = "animation",
+    MANGA = "manga",
+    GAMES = "games",
+    NOVELS = "novels",
+    LIVE_ACTION = "live-action",
+    COVID_19 = "covid-19",
+    INDUSTRY = "industry",
+    MUSIC = "music",
+    PEOPLE = "people",
+    MERCH = "merch",
+    EVENTS = "events"
+}
+export interface ProxyConfig {
+    /**
+     * The proxy URL
+     * @example https://proxy.com
+     **/
+    url: string | string[];
+    /**
+     * X-API-Key header value (if any)
+     **/
+    key?: string;
+    /**
+     * The proxy rotation interval in milliseconds. (default: 5000)
+     */
+    rotateInterval?: number;
+}
+export interface IRoles {
+    id: string;
+    title: ITitle;
+    type?: string;
+    image: {
+        extraLarge?: string;
+        large?: string;
+        medium?: string;
+    };
+    color?: string;
+}
+export interface IStaff {
+    id: string;
+    name: {
+        first?: string;
+        last?: string;
+        native?: string;
+        full?: string;
+    };
+    image?: {
+        large?: string;
+        medium?: string;
+    };
+    description?: string;
+    siteUrl?: string;
+    roles?: IRoles[];
+}
+export {};

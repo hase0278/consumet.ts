@@ -1,7 +1,2 @@
-import Libgen from './libgen';
-import ZLibrary from './zLibrary';
-declare const _default: {
-    Libgen: typeof Libgen;
-    ZLibrary: typeof ZLibrary;
-};
+declare const _default: {};
 export default _default;

@@ -1,5 +1,6 @@
 import { IVideo, ISource } from '.';
-declare abstract class VideoExtractor {
+import Proxy from '../models/proxy';
+declare abstract class VideoExtractor extends Proxy {
     /**
      * The server name of the video provider
      */

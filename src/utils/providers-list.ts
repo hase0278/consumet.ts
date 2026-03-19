@@ -1,17 +1,36 @@
-import { ANIME, MANGA, BOOKS, COMICS, LIGHT_NOVELS, MOVIES, META } from '../providers';
+import { ANIME, MANGA, BOOKS, COMICS, LIGHT_NOVELS, MOVIES, META, NEWS } from '../providers';
 
-/**
- * List of providers
- *
- * add new providers here (order does not matter)
- */
+// List of providers
 export const PROVIDERS_LIST = {
-  ANIME: [new ANIME.Gogoanime(), new ANIME.NineAnime(), new ANIME.AnimePahe()],
-  MANGA: [new MANGA.MangaDex(), new MANGA.MangaHere()],
-  BOOKS: [new BOOKS.Libgen()],
+  ANIME: [
+    new ANIME.AnimePahe(),
+    new ANIME.Hianime(),
+    new ANIME.AnimeKai(),
+    new ANIME.AnimeUnity(),
+    new ANIME.KickAssAnime(),
+    new ANIME.AnimeSaturn(),
+  ],
+  MANGA: [
+    new MANGA.WeebCentral(),
+    new MANGA.MangaHere(),
+    new MANGA.MangaPill(),
+    new MANGA.MangaDex(),
+    new MANGA.MangaReader(),
+    new MANGA.MangaKakalot(),
+    new MANGA.ComicK(),
+  ],
+  BOOKS: [],
   COMICS: [new COMICS.GetComics()],
-  LIGHT_NOVELS: [new LIGHT_NOVELS.ReadLightNovels()],
-  MOVIES: [new MOVIES.FlixHQ()],
-  META: [new META.Anilist()],
+  LIGHT_NOVELS: [],
+  MOVIES: [
+    new MOVIES.DramaCool(),
+    new MOVIES.FlixHQ(),
+    new MOVIES.Goku(),
+    new MOVIES.SFlix(),
+    new MOVIES.HiMovies(),
+    new MOVIES.Turkish(),
+  ],
+  NEWS: [new NEWS.ANN()],
+  META: [new META.Anilist(), new META.TMDB(), new META.Myanimelist()],
   OTHERS: [],
 };

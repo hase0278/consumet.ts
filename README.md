@@ -8,17 +8,17 @@ consumet.ts is a Node library which provides high-level APIs to get information 
   <a href="https://www.npmjs.com/package/@consumet/extensions">
     <img src="https://img.shields.io/npm/v/@consumet/extensions" alt="npm (scoped)">
   </a>
-  <a href="https://github.com/consumet/extensions/actions?query=workflow%3A%2Node.js+CI%22">
-    <img src="https://img.shields.io/github/workflow/status/consumet/consumet.ts/Node.js%20CI/master" alt="GitHub Workflow Status (branch)">
+  <a href="https://github.com/consumet/consumet.ts/actions/workflows/npm-publish.yml">
+    <img src="https://github.com/consumet/consumet.ts/actions/workflows/npm-publish.yml/badge.svg" alt="npm (scoped)">
   </a>
     <a href="https://discord.gg/qTPfvMxzNH">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="Prs are welcome">
   </a>
-    <a href="https://github.com/consumet/consumet.ts/blob/master/LICENSE">
-    <img src="https://img.shields.io/npm/l/@consumet/extensions" alt="GitHub">
-  </a>
-  <a href="https://discord.gg/qTPfvMxzNH">
-    <img src="https://img.shields.io/discord/987492554486452315.svg?label=discord&labelColor=7289da&color=2c2f33" alt="Discord">
+    <a href="https://discord.gg/qTPfvMxzNH">
+      <img src="https://img.shields.io/discord/987492554486452315?color=7289da&label=discord&logo=discord&logoColor=7289da" alt="Discord">
+    </a>
+      <a href="https://github.com/consumet/consumet.ts/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="GitHub">
   </a>
 </p>
 
@@ -32,7 +32,8 @@ consumet.ts is a Node library which provides high-level APIs to get information 
 - [Provider Request](#provider-request)
 - [Contributing](#contributing)
 - [Support](#support)
-- [Contributors](#contributors)
+- [Contributors ✨](#contributors-)
+  - [Credits](#credits)
 - [License](#license)
 
 ## Quick Start
@@ -60,7 +61,7 @@ const data = books.search('pride and prejudice').then(data => {
 })
 ```
 
-**Exmaple** - searching for anime using the gogoanime provider.
+**Example** - searching for anime using the gogoanime provider.
 ```ts
 import { ANIME } from "@consumet/extensions"
 
@@ -85,10 +86,11 @@ Do you want to know more? Head to the [`Getting Started`](https://github.com/con
 - [`Light Novels`](./docs/guides/light-novels.md)
 - [`Comics`](./docs/guides/comics.md)
 - [`Meta`](./docs/guides/meta.md)
+- [`News`](./docs/guides/news.md)
 
 ## Ecosystem
 - [Rest-API Reference](https://docs.consumet.org/) - public rest api documentation
-- [Examples](https://github.com/consumet/extentions/tree/master/examples) - examples of using consumet.ts.
+- [Examples](https://github.com/consumet/consumet.ts/tree/master/examples) - examples of using consumet.ts.
 - [Provider Status](https://github.com/consumet/providers-status/blob/main/README.md) - A list of providers and their status.
 - [Changelog](https://github.com/consumet/consumet.ts/blob/master/CHANGELOG.md) - See the latest changes.
 - [Discord Server](https://discord.gg/qTPfvMxzNH) - Join our discord server and chat with the maintainers.
@@ -100,12 +102,19 @@ Make a new [issue](https://github.com/consumet/consumet.ts/issues/new?assignees=
 Check out [contributing guide](https://github.com/consumet/consumet.ts/blob/master/CONTRIBUTING.md) to get an overview of consumet.ts development.
 
 ## Support
-Please join the [discord server](https://discord.gg/qTPfvMxzNH) to ask questions, get help, or report issues.
+You can contact the maintainers of consumet.ts via [email](mailto:consumet.org@gmail.com), or [join the discord server](https://discord.gg/qTPfvMxzNH) (Recommended).
 
-## Contributors
-Thanks to the following people who have contributed to this repo:
+<a href="https://discord.gg/qTPfvMxzNH">
+   <img src="https://discordapp.com/api/guilds/987492554486452315/widget.png?style=banner2">
+</a>
 
-[![](https://avatars.githubusercontent.com/u/57333995?s=50)](https://github.com/riimuru) [![](https://avatars.githubusercontent.com/u/80477926?s=50)](https://github.com/prince-ao)
+## Contributors ✨
+Thanks to the following people for keeping this project alive and thriving.
+
+[![](https://contrib.rocks/image?repo=consumet/consumet.ts)](https://github.com/consumet/consumet.ts/graphs/contributors)
+
+### Credits
+- [Anify API](https://github.com/Eltik/Anify) - Used as a caching layer for the meta/anilist provider to speed up responses. 
 
 ## License
-Licensed under [MIT](./LICENSE).
+Licensed under [GPL-3.0](./LICENSE).

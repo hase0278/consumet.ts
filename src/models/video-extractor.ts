@@ -1,6 +1,7 @@
-import { IVideo, ISource, ISubtitle } from '.';
+import { IVideo, ISource } from '.';
+import Proxy from '../models/proxy';
 
-abstract class VideoExtractor {
+abstract class VideoExtractor extends Proxy {
   /**
    * The server name of the video provider
    */

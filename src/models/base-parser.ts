@@ -1,4 +1,6 @@
-import { BaseProvider } from '.';
+import { AxiosAdapter } from 'axios';
+
+import { BaseProvider, ProxyConfig } from '.';
 
 abstract class BaseParser extends BaseProvider {
   /**

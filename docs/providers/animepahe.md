@@ -9,6 +9,7 @@ const animepahe = new ANIME.AnimePahe();
 - [search](#search)
 - [fetchAnimeInfo](#fetchanimeinfo)
 - [fetchEpisodeSources](#fetchepisodesources)
+- [fetchRecentEpisodes](#fetchRecentEpisodes)
 
 ### search
 > Note: This method is a subclass of the [`BaseParser`](https://github.com/consumet/extensions/blob/master/src/models/base-parser.ts) class. meaning it is available across most categories.
@@ -23,7 +24,7 @@ const animepahe = new ANIME.AnimePahe();
 ```ts
 animepahe.search("Overlord IV").then(data => {
   console.log(data);
-}
+})
 ```
 
 returns a promise which resolves into an array of anime. (*[`Promise<ISearch<IAnimeResult[]>>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L13-L26)*)\
@@ -66,7 +67,7 @@ output:
 ```ts
 animepahe.fetchAnimeInfo("adb84358-8fec-fe80-1dc5-ad6218421dc1").then(data => {
   console.log(data);
-}
+})
 ```
 
 returns a promise which resolves into an anime info object (including the episodes). (*[`Promise<IAnimeInfo>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L28-L42)*)\
@@ -111,7 +112,7 @@ In this example, we're getting the sources for the first episode of Overlord IV.
 ```ts
 animepahe.fetchEpisodeSources("c673b4d6cedf5e4cd1900d30d61ee2130e23a74e58f4401a85f21a4e95c94f73").then(data => {
   console.log(data);
-}
+})
 ```
 
 returns a promise which resolves into an array of episode sources. (*[`Promise<ISource>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L210-L214)*)\
@@ -143,5 +144,41 @@ output:
 ```
 
 Make sure to check the `headers` property of the returned object. It contains the referer header, which is needed to bypass the 403 error and allow you to stream the video without any issues.
+
+### fetchRecentEpisodes
+
+<h4>Parameters</h4>
+
+| Parameter        | Type     | Description                                                                  |
+| ---------------- | -------- | ---------------------------------------------------------------------------- |
+| page (optional)  | `number` | page number (default: 1)                                                     |
+
+```ts
+animepahe.fetchRecentEpisodes().then(data => {
+  console.log(data);
+})
+```
+returns a promise which resolves into an array of anime. (*[`Promise<ISearch<IAnimeResult[]>>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L13-L26)*)\
+output:
+```js
+{
+  currentPage: 1,
+  totalResults: 5992,
+  totalPages: 500,
+  results: [
+    {
+      id: 'd6f0f7bc-64bc-8ef2-1e72-6b958eb8ab3e',
+      title: "My Status as an Assassin Obviously Exceeds the Hero's",
+      episodeId: 'd6f0f7bc-64bc-8ef2-1e72-6b958eb8ab3e/9bb1c1bfe4d0add8cd2b469d73d6f6d28a3b27df9f6c1c9864b538b91023aaea',
+      episodeImage: 'https://i.animepahe.si/snapshots/e534e13706d4b4a230ee86df85c34550ae189ef7f9ac3d823b319d33dbc74b7f.jpg',
+      episodeNumber: 8,
+      url: 'https://animepahe.si/play/d6f0f7bc-64bc-8ef2-1e72-6b958eb8ab3e/9bb1c1bfe4d0add8cd2b469d73d6f6d28a3b27df9f6c1c9864b538b91023aaea'
+    },
+    {...}
+    ...
+  ]
+}
+```
+
 
 <p align="end">(<a href="https://github.com/consumet/extensions/blob/master/docs/guides/anime.md#">back to anime providers list</a>)</p>

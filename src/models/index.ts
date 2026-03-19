@@ -7,7 +7,9 @@ import VideoExtractor from './video-extractor';
 import MangaParser from './manga-parser';
 import LightNovelParser from './lightnovel-parser';
 import MovieParser from './movie-parser';
+import NewsParser from './news-parser';
 import {
+  Trailer,
   IProviderStats,
   ISearch,
   IAnimeEpisode,
@@ -28,7 +30,6 @@ import {
   ILightNovelChapterContent,
   GetComicsComics,
   ComicRes,
-  ZLibrary,
   IMangaChapterPage,
   TvType,
   IMovieEpisode,
@@ -36,8 +37,19 @@ import {
   ISource,
   ISubtitle,
   IMovieResult,
+  Intro,
+  Genres,
+  INewsFeed,
+  Topics,
+  INewsInfo,
+  FuzzyDate,
+  ITitle,
+  MediaFormat,
+  ProxyConfig,
+  IStaff,
+  WatchListType,
 } from './types';
-import { LibgenBookObject, GetComicsComicsObject, ZLibraryObject } from './type-objects';
+import { LibgenBookObject, GetComicsComicsObject } from './type-objects';
 
 export {
   BaseProvider,
@@ -58,6 +70,7 @@ export {
   SubOrSub,
   LightNovelParser,
   MangaParser,
+  NewsParser,
   IMangaResult,
   IMangaChapter,
   IMangaInfo,
@@ -69,8 +82,6 @@ export {
   GetComicsComics,
   GetComicsComicsObject,
   ComicRes,
-  ZLibrary,
-  ZLibraryObject,
   ISearch,
   IMangaChapterPage,
   TvType,
@@ -80,4 +91,16 @@ export {
   ISource,
   ISubtitle,
   IMovieResult,
+  Intro,
+  Genres,
+  INewsFeed,
+  Topics,
+  INewsInfo,
+  FuzzyDate,
+  ITitle,
+  MediaFormat,
+  ProxyConfig,
+  IStaff,
+  WatchListType,
+  Trailer,
 };

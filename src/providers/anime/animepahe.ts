@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { load } from 'cheerio';
 
 import {
@@ -10,23 +9,27 @@ import {
   ISource,
   IAnimeEpisode,
   IEpisodeServer,
+  MediaFormat,
 } from '../../models';
-import { Kwik } from '../../utils';
+import { USER_AGENT } from '../../utils';
+import { Kwik } from '../../extractors';
 
 class AnimePahe extends AnimeParser {
   override readonly name = 'AnimePahe';
-  protected override baseUrl = 'https://animepahe.com';
+  protected override baseUrl = 'https://animepahe.si';
   protected override logo = 'https://animepahe.com/pikacon.ico';
   protected override classPath = 'ANIME.AnimePahe';
 
   /**
-   * @param query Search query
+   * Search for anime
+   * @param query Search query string
+   * @returns Promise<ISearch<IAnimeResult>>
    */
   override search = async (query: string): Promise<ISearch<IAnimeResult>> => {
     try {
-      const { data } = await axios.get(
-        `${this.baseUrl}/api?m=search&q=${encodeURIComponent(query)}`
-      );
+      const { data } = await this.client.get(`${this.baseUrl}/api?m=search&q=${encodeURIComponent(query)}`, {
+        headers: this.Headers(false),
+      });
 
       const res = {
         results: data.data.map((item: any) => ({
@@ -46,8 +49,40 @@ class AnimePahe extends AnimeParser {
   };
 
   /**
-   * @param id Anime id
-   * @param episodePage Episode page number (optional) default: -1 to get all episodes. number of episode pages can be found in the anime info object
+   * @param page page number (optional)
+   * @returns Promise<ISearch<IAnimeResult>>
+   */
+  async fetchRecentEpisodes(page: number = 1): Promise<ISearch<IAnimeResult>> {
+    try {
+      const { data } = await this.client.get(`${this.baseUrl}/api?m=airing&page=${page}`, {
+        headers: this.Headers(false),
+      });
+
+      const res = {
+        currentPage: data.current_page,
+        totalResults: data.total,
+        totalPages: data.last_page,
+        results: data.data.map((item: any) => ({
+          id: item.anime_session,
+          title: item.anime_title,
+          episodeId: `${item.anime_session}/${item.session}`,
+          episodeImage: item.snapshot,
+          episodeNumber: item.episode,
+          url: `${this.baseUrl}/play/${item.anime_session}/${item.session}`,
+        })),
+      };
+
+      return res;
+    } catch (err) {
+      throw new Error((err as Error).message);
+    }
+  }
+
+  /**
+   * Fetch anime information
+   * @param id Anime ID in format id/session
+   * @param episodePage Episode page number (default: -1 for all episodes)
+   * @returns Promise<IAnimeInfo>
    */
   override fetchAnimeInfo = async (id: string, episodePage: number = -1): Promise<IAnimeInfo> => {
     const animeInfo: IAnimeInfo = {
@@ -56,21 +91,29 @@ class AnimePahe extends AnimeParser {
     };
 
     try {
-      const res = await axios.get(`${this.baseUrl}/anime/${id}`);
-
+      const res = await this.client.get(`${this.baseUrl}/anime/${id}`, { headers: this.Headers(id) });
       const $ = load(res.data);
 
-      animeInfo.title = $('div.header-wrapper > header > div > h1 > span').text();
-      animeInfo.image = $('header > div > div > div > a > img').attr('data-src');
-      animeInfo.cover = `https:${$('body > section > article > div.header-wrapper > div').attr(
-        'data-src'
-      )}`;
-      animeInfo.description = $('div.col-sm-8.anime-summary > div').text();
-      animeInfo.genres = $('div.col-sm-4.anime-info > div > ul > li')
+      animeInfo.title = $('div.title-wrapper > h1 > span').first().text();
+      animeInfo.image = $('div.anime-poster a').attr('href');
+      animeInfo.cover = `https:${$('div.anime-cover').attr('data-src')}`;
+      animeInfo.description = $('div.anime-summary').text().trim();
+      animeInfo.genres = $('div.anime-genre ul li')
         .map((i, el) => $(el).find('a').attr('title'))
         .get();
+      animeInfo.hasSub = true;
 
-      switch ($('div.col-sm-4.anime-info > p:nth-child(4) > a').text().trim()) {
+      animeInfo.externalLinks = [];
+      $('p.external-links > a').each((i, el) => {
+        const url = $(el).attr('href')?.trim();
+        animeInfo.externalLinks?.push({
+          id: url?.includes('?') ? url?.split('?')[1].split('=')[1] : url?.split('/').pop(),
+          url: url,
+          sourceName: $(el).text().trim(),
+        });
+      });
+
+      switch ($('div.anime-info p:icontains("Status:") a').text().trim()) {
         case 'Currently Airing':
           animeInfo.status = MediaStatus.ONGOING;
           break;
@@ -80,31 +123,58 @@ class AnimePahe extends AnimeParser {
         default:
           animeInfo.status = MediaStatus.UNKNOWN;
       }
-      animeInfo.type = $('div.col-sm-4.anime-info > p:nth-child(2) > a').text().trim();
-      animeInfo.releaseDate = $('div.col-sm-4.anime-info > p:nth-child(5)')
+      animeInfo.type = $('div.anime-info > p:contains("Type:") > a')
+        .text()
+        .trim()
+        .toUpperCase() as MediaFormat;
+      animeInfo.releaseDate = $('div.anime-info > p:contains("Aired:")')
         .text()
         .split('to')[0]
         .replace('Aired:', '')
         .trim();
-      animeInfo.aired = $('div.col-sm-4.anime-info > p:nth-child(5)')
-        .text()
-        .replace('Aired:', '')
-        .trim()
-        .replace('\n', ' ');
-      animeInfo.studios = $('div.col-sm-4.anime-info > p:nth-child(7)')
+      animeInfo.studios = $('div.anime-info > p:contains("Studio:")')
         .text()
         .replace('Studio:', '')
         .trim()
         .split('\n');
+
       animeInfo.totalEpisodes = parseInt(
-        $('div.col-sm-4.anime-info > p:nth-child(3)').text().replace('Episodes:', '')
+        $('div.anime-info > p:contains("Episodes:")').text().replace('Episodes:', '')
       );
+      animeInfo.recommendations = [];
+      $('div.anime-recommendation .col-sm-6').each((i, el) => {
+        animeInfo.recommendations?.push({
+          id: $(el).find('.col-2 > a').attr('href')?.split('/')[2]!,
+          title: $(el).find('.col-2 > a').attr('title')!,
+          image:
+            $(el).find('.col-2 > a > img').attr('src') || $(el).find('.col-2 > a > img').attr('data-src'),
+          url: `${this.baseUrl}/anime/${$(el).find('.col-2 > a').attr('href')?.split('/')[2]}`,
+          releaseDate: $(el).find('div.col-9 > a').text().trim(),
+          status: $(el).find('div.col-9 > strong').text().trim() as MediaStatus,
+        });
+      });
+
+      animeInfo.relations = [];
+      $('div.anime-relation .col-sm-6').each((i, el) => {
+        animeInfo.relations?.push({
+          id: $(el).find('.col-2 > a').attr('href')?.split('/')[2]!,
+          title: $(el).find('.col-2 > a').attr('title')!,
+          image:
+            $(el).find('.col-2 > a > img').attr('src') || $(el).find('.col-2 > a > img').attr('data-src'),
+          url: `${this.baseUrl}/anime/${$(el).find('.col-2 > a').attr('href')?.split('/')[2]}`,
+          releaseDate: $(el).find('div.col-9 > a').text().trim(),
+          status: $(el).find('div.col-9 > strong').text().trim() as MediaStatus,
+          relationType: $(el).find('h4 > span').text().trim(),
+        });
+      });
 
       animeInfo.episodes = [];
       if (episodePage < 0) {
         const {
           data: { last_page, data },
-        } = await axios.get(`${this.baseUrl}/api?m=release&id=${id}&sort=episode_asc&page=1`);
+        } = await this.client.get(`${this.baseUrl}/api?m=release&id=${id}&sort=episode_asc&page=1`, {
+          headers: this.Headers(id),
+        });
 
         animeInfo.episodePages = last_page;
 
@@ -112,11 +182,12 @@ class AnimePahe extends AnimeParser {
           ...data.map(
             (item: any) =>
               ({
-                id: item.session,
+                id: `${id}/${item.session}`,
                 number: item.episode,
                 title: item.title,
                 image: item.snapshot,
                 duration: item.duration,
+                url: `${this.baseUrl}/play/${id}/${item.session}`,
               } as IAnimeEpisode)
           )
         );
@@ -135,22 +206,30 @@ class AnimePahe extends AnimeParser {
   };
 
   /**
-   *
-   * @param episodeId Episode id
+   * Fetch episode video sources
+   * @param episodeId Episode ID
+   * @returns Promise<ISource>
    */
   override fetchEpisodeSources = async (episodeId: string): Promise<ISource> => {
     try {
-      const { data } = await axios.get(`${this.baseUrl}/api?m=links&id=${episodeId}`, {
-        headers: {
-          Referer: `${this.baseUrl}`,
-        },
+      const { data } = await this.client.get(`${this.baseUrl}/play/${episodeId}`, {
+        headers: this.Headers(episodeId.split('/')[0]),
       });
 
-      const links = data.data.map((item: any) => ({
-        quality: Object.keys(item)[0],
-        iframe: item[Object.keys(item)[0]].kwik,
-        size: item[Object.keys(item)[0]].filesize,
+      const $ = load(data);
+
+      const links = $('div#resolutionMenu > button').map((i, el) => ({
+        url: $(el).attr('data-src')!,
+        quality: $(el).text(),
+        audio: $(el).attr('data-audio'),
       }));
+
+      const downloads = $('div#pickDownload > a')
+        .map((i, el) => ({
+          url: $(el).attr('href')!,
+          quality: $(el).text(),
+        }))
+        .get();
 
       const iSource: ISource = {
         headers: {
@@ -158,11 +237,22 @@ class AnimePahe extends AnimeParser {
         },
         sources: [],
       };
+
+      // more link, more slow
       for (const link of links) {
-        const res = await new Kwik().extract(new URL(link.iframe));
+        const res = await new Kwik(this.proxyConfig).extract(new URL(link.url));
         res[0].quality = link.quality;
-        res[0].size = link.size;
+        res[0].isDub = link.audio === 'eng';
         iSource.sources.push(res[0]);
+      }
+
+      iSource.download = [];
+      for (const download of downloads) {
+        const res = await new Kwik(this.proxyConfig).getDirectDownloadLink(new URL(download.url));
+        iSource.download.push({
+          url: res!,
+          quality: download.quality,
+        });
       }
 
       return iSource;
@@ -171,33 +261,56 @@ class AnimePahe extends AnimeParser {
     }
   };
 
-  private fetchEpisodes = async (id: string, page: number): Promise<IAnimeEpisode[]> => {
-    const res = await axios.get(
-      `${this.baseUrl}/api?m=release&id=${id}&sort=episode_asc&page=${page}`
+  private fetchEpisodes = async (session: string, page: number): Promise<IAnimeEpisode[]> => {
+    const res = await this.client.get(
+      `${this.baseUrl}/api?m=release&id=${session}&sort=episode_asc&page=${page}`,
+      { headers: this.Headers(session) }
     );
-    console.log(`${this.baseUrl}/api?m=release&id=${id}&sort=episode_asc&page=${page}`);
+
     const epData = res.data.data;
 
     return [
       ...epData.map(
         (item: any): IAnimeEpisode => ({
-          id: item.session,
+          id: `${session}/${item.session}`,
           number: item.episode,
           title: item.title,
           image: item.snapshot,
           duration: item.duration,
+          url: `${this.baseUrl}/play/${session}/${item.session}`,
         })
       ),
     ] as IAnimeEpisode[];
   };
 
   /**
-   * @deprecated
-   * @attention AnimePahe doesn't support this method
+   * Fetch episode servers (deprecated)
+   * @deprecated AnimePahe doesn't support this method
+   * @param episodeLink Episode link
+   * @returns Promise<IEpisodeServer[]>
    */
   override fetchEpisodeServers = (episodeLink: string): Promise<IEpisodeServer[]> => {
     throw new Error('Method not implemented.');
   };
+
+  private Headers(sessionId: string | false) {
+    return {
+      authority: 'animepahe.si',
+      accept: 'application/json, text/javascript, */*; q=0.01',
+      'accept-language': 'en-US,en;q=0.9',
+      cookie: '__ddg2_=;',
+      dnt: '1',
+      'sec-ch-ua': '"Not A(Brand";v="99", "Microsoft Edge";v="121", "Chromium";v="121"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'same-origin',
+      'x-requested-with': 'XMLHttpRequest',
+      referer: sessionId ? `${this.baseUrl}/anime/${sessionId}` : `${this.baseUrl}`,
+      'user-agent': USER_AGENT,
+    };
+  }
 }
 
 export default AnimePahe;

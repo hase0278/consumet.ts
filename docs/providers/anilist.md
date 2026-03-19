@@ -10,7 +10,11 @@ const anilist = new META.Anilist();
 <h2>Methods</h2>
 
 - [search](#search)
+- [fetchTrendingAnime](#fetchtrendinganime)
+- [fetchPopularAnime](#fetchpopularanime)
 - [fetchAnimeInfo](#fetchanimeinfo)
+- [fetchAnimeGenres](#fetchanimegenres)
+- [fetchAiringSchedule](#fetchairingschedule)
 - [fetchEpisodeSources](#fetchepisodesources)
 
 ### search
@@ -26,7 +30,7 @@ const anilist = new META.Anilist();
 ```ts
 anilist.search("Classroom of the elite").then(data => {
   console.log(data);
-}
+})
 ```
 
 returns a promise which resolves into an array of anime. (*[`Promise<ISearch<IAnimeResult[]>>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L13-L26)*)\
@@ -66,6 +70,130 @@ output:
 }
 ```
 
+### fetchTrendingAnime
+
+<h4>Parameters</h4>
+
+| Parameter          | Type     | Description                 |
+| ------------------ | -------- | --------------------------- |
+| page (optional)    | `number` | page number to search for.  |
+| perPage (optional) | `number` | number of results per page. |
+
+```ts
+anilist.fetchTrendingAnime().then(data => {
+  console.log(data);
+})
+```
+
+returns a promise which resolves into an array of anime. (*[`Promise<ISearch<IAnimeResult[]>>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L13-L26)*)\
+output:
+```ts
+{
+  currentPage: 1,
+  hasNextPage: true,
+  results: [
+    {
+      id: '153288',
+      malId: null,
+      title: {
+          romaji: 'Kaijuu 8-gou',
+          english: 'Kaiju No.8',
+          native: '怪獣８号',
+          userPreferred: 'Kaijuu 8-gou'
+      },
+      image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153288-INFE21hHhAUD.jpg',
+      trailer: {
+          id: '-MaTda-Ws3Y',
+          site: 'youtube',
+          thumbnail: 'https://i.ytimg.com/vi/-MaTda-Ws3Y/hqdefault.jpg'
+      },
+      cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153288-INFE21hHhAUD.jpg',
+      rating: null,
+      releaseDate: null,
+      totalEpisodes: 0,
+      duration: null,
+      type: null
+    },
+    {
+      id: '130592',
+      malId: 48413,
+      title: {...},
+      image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx130592-LAUlhx15mxQu.jpg',
+      trailer: {...},
+      cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/130592-WPfrW1SR4dnY.jpg',
+      rating: 74,
+      releaseDate: 2022,
+      totalEpisodes: 12,
+      duration: 24,
+      score: 75,
+      type: 'TV'
+    },
+  ]
+}
+```
+
+### fetchPopularAnime
+
+<h4>Parameters</h4>
+
+| Parameter          | Type     | Description                 |
+| ------------------ | -------- | --------------------------- |
+| page (optional)    | `number` | page number to search for.  |
+| perPage (optional) | `number` | number of results per page. |
+
+```ts
+anilist.fetchPopularAnime().then(data => {
+  console.log(data);
+})
+```
+
+returns a promise which resolves into an array of anime. (*[`Promise<ISearch<IAnimeResult[]>>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L13-L26)*)\
+output:
+```ts
+{
+  currentPage: 1,
+  hasNextPage: true,
+  results: [
+    {
+      id: '153288',
+      malId: null,
+      title: {
+          romaji: 'Kaijuu 8-gou',
+          english: 'Kaiju No.8',
+          native: '怪獣８号',
+          userPreferred: 'Kaijuu 8-gou'
+      },
+      image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153288-INFE21hHhAUD.jpg',
+      trailer: {
+          id: '-MaTda-Ws3Y',
+          site: 'youtube',
+          thumbnail: 'https://i.ytimg.com/vi/-MaTda-Ws3Y/hqdefault.jpg'
+      },
+      cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx153288-INFE21hHhAUD.jpg',
+      rating: null,
+      releaseDate: null,
+      totalEpisodes: 0,
+      duration: null,
+      type: null
+    },
+    {
+      id: '130592',
+      malId: 48413,
+      title: {...},
+      image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx130592-LAUlhx15mxQu.jpg',
+      trailer: {...},
+      cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/130592-WPfrW1SR4dnY.jpg',
+      rating: 74,
+      releaseDate: 2022,
+      totalEpisodes: 12,
+      duration: 24,
+      score: 75,
+      type: 'TV'
+    },
+  ]
+}
+```
+
 ### fetchAnimeInfo
 
 <h4>Parameters</h4>
@@ -79,7 +207,7 @@ output:
 ```ts
 anilist.fetchAnimeInfo("98659").then(data => {
   console.log(data);
-}
+})
 ```
 
 returns a promise which resolves into an anime info object (including the episodes). (*[`Promise<IAnimeInfo>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L28-L42)*)\
@@ -93,27 +221,174 @@ output:
     native: 'ようこそ実力至上主義の教室へ',
     userPreferred: 'Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e'
   },
-  malId: '35507',
+  malId: 35507,
+  trailer: {
+    id: 'gMZDGyihTyc',
+    site: 'youtube',
+    thumbnail: 'https://i.ytimg.com/vi/gMZDGyihTyc/hqdefault.jpg'
+  },
   image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/b98659-sH5z5RfMuyMr.png',
+  cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/111321-nnetF1qONAcE.jpg',
   description: 'Koudo Ikusei Senior High School is a leading school with state-of-the-art facilities. The students there have the freedom to wear any hairstyle ...',
   status: 'Completed',
   releaseDate: 2017,
+  nextAiringEpisode:{
+    airingTime: 2312312123,
+    timeUntilAiring: 12512355,
+    episode: 5,
+  }
   rating: 77,
   duration: 24,
   genres: [ 'Drama', 'Psychological' ],
+  studios: [ 'Lerche' ],
   subOrDub: 'sub',
+  recommendations: [ 
+      {
+        id: 101921,
+        idMal: 37999,
+        title: {
+          romaji: 'Kaguya-sama wa Kokurasetai: Tensaitachi no Renai Zunousen',
+          english: 'Kaguya-sama: Love is War',
+          native: undefined,
+          userPreferred: undefined
+        },
+        status: 'Completed',
+        episodes: 12,
+        image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx101921-VvdGQy1ZySYf.jpg',
+        cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/101921-GgvvFhlNhzlF.jpg',
+        score: 83
+      },
+      {...}
+      ...
+  ],
   episodes: [
     {
       id: 'youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e-tv-episode-12',
       title: 'What is evil? Whatever springs from weakness.',
-      image: 'https://media.kitsu.io/episodes/thumbnails/228542/original.jpg',
+      image: 'https://media.kitsu.app/episodes/thumbnails/228542/original.jpg',
       number: 12,
-      description: "Melancholy, unmotivated Ayanokoji Kiyotaka attends his first day at Tokyo Metropoiltan Advanced Nuturing High School, ..."
+      description: "Melancholy, unmotivated Ayanokoji Kiyotaka attends his first day at Tokyo Metropoiltan Advanced Nuturing High School, ...",
+      url: '...'
     },
     {...}
     ...
   ]
 }
+```
+
+### fetchAnimeGenres
+
+<h4>Parameters</h4>
+
+| Parameter          | Type     | Description                 |
+| ------------------ | -------- | --------------------------- |
+| genres    | `string[]` | a list containing the genres of the animes to fetch.  |
+| page (optional)    | `number` | page number to search for.  |
+| perPage (optional) | `number` | number of results per page. |
+
+
+```ts
+anilist.fetchAnimeGenres(["Action", "Adventure"])
+.then(data => {
+  console.log(data);
+})
+```
+returns a promise which resolves into an array of anime. (*[`Promise<ISearch<IAnimeResult[]>>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L13-L26)*)\
+output:
+
+```ts
+{
+  currentPage: 1,
+  hasNextPage: true,
+  results: [
+    {
+      id: '1',
+      malId: 1,
+      title: {...},
+      image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx1-CXtrrkMpJ8Zq.png',
+      trailer: {...},
+      description: 'Enter a world in the distant future, where Bounty Hunters roam the solar system. Spike and Jet, bounty hunting partners, set out on journeys in an ever struggling effort to win bounty rewards to survive.<br><br>\n' +
+        'While traveling, they meet up with other very interesting people. Could Faye, the beautiful and ridiculously poor gambler, Edward, the computer genius, and Ein, the engineered dog be a good addition to the group?',
+      cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/1-T3PJUjFJyRwg.jpg',
+      rating: 86,
+      releaseDate: 1998,
+      totalEpisodes: 26,
+      duration: 24,
+      type: 'TV'
+    },
+    {...}
+  ]
+}
+```
+
+### fetchAiringSchedule
+
+<h4>Parameters</h4>
+
+| Parameter              | Type      | Description                                                                                                                                                                        |
+| ---------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| page (optional)        | `number`  | page number to search for.                                                                                                                                                         |
+| perPage (optional)     | `number`  | number of results per page.                                                                                                                                                        |
+| weekStart              | `number`  | Filter by the time of airing. eg. if you set weekStart to this week's monday, and set weekEnd to next week's sunday, you will get all the airing anime in between these two dates. |
+| weekEnd                | `number`  | Filter by the time of airing.                                                                                                                                                      |
+| notYetAired (optional) | `boolean` | Filter to episodes that haven't yet aired. (default: false)                                                                                                                        |
+
+
+```ts
+anilist.fetchAiringSchedule(1 , 20, 1660047922, 1661832000, true).then(data => {
+  console.log(data);
+})
+```
+
+returns a promise which resolves into an array of anime. (*[`Promise<ISearch<IAnimeResult[]>>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L13-L26)*)\
+output:
+```ts
+
+    {
+      currentPage: 1,
+      hasNextPage: true,
+      results: [
+        {
+          id: '133844',
+          malId: 48895,
+          episode: 6,
+          airingAt: 1660050000,
+          title: {
+            romaji: 'SHINE POST',
+            english: 'SHINEPOST',
+            native: 'シャインポスト',
+            userPreferred: 'SHINE POST'
+          },
+          image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx133844-E32FjKZ0XxEs.jpg',
+          description: 'The fourth season of <i>Overlord</i>.',
+          cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/banner/133844-uIaUmh5aJX3M.jpg',
+          rating: 80,
+          releaseDate: 2022,
+          type: 'TV'
+        },
+        {
+          id: '146210',
+          malId: 51213,
+          episode: 6,
+          airingAt: 1660051800,
+          title: {
+            romaji: 'Jashin-chan Dropkick X',
+            english: 'Dropkick on My Devil!!! X',
+            native: '邪神ちゃんドロップキックX',
+            userPreferred: 'Jashin-chan Dropkick X'
+          },
+          image: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx146210-ZnIithxFLLHn.jpg',
+          description: 'Meet Alto, a hapless student at Royal Ortigia Magic Academy whose academic performance leaves much to be desired. Rather than take a more sensible approach to salvaging his grades in time for graduation',
+          cover: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx146210-ZnIithxFLLHn.jpg',
+          rating: 69,
+          releaseDate: 2022,
+          type: 'TV'
+        },
+        {...},
+        ...
+      ]
+    }
+  
 ```
 
 ### fetchEpisodeSources
@@ -131,7 +406,7 @@ In this example, we're getting the sources for the first episode of classroom of
 ```ts
 anilist.fetchEpisodeSources("youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e-tv-episode-12").then(data => {
   console.log(data);
-}
+})
 ```
 
 returns a promise which resolves into an array of episode sources. (*[`Promise<ISource>`](https://github.com/consumet/extensions/blob/master/src/models/types.ts#L210-L214)*)\
